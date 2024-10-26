@@ -297,6 +297,9 @@ def main(seed):
 
             print('>>>>>>>start training : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
             exp.train(setting)
+            print('>>>>>>>start testing : {}>>>>>>>>>>>>>>>>>>>>>>>>>>'.format(setting))
+
+            exp.test(setting)
 
 
     else:
@@ -311,7 +314,7 @@ def main(seed):
         exp.test(setting, test=1)
 
 if __name__ == "__main__":
-    seed_all=[1986,2021, 2023, ]
+    seed_all=[2024, 2025, 2026, 2027, 2028]
     for seed in seed_all:
         main(seed)
 

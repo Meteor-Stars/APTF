@@ -288,8 +288,7 @@ class Exp_Main(Exp_Basic):
                 self.model_2.train()
             epoch_time = time.time()
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
-                # print(batch_x.shape)
-                # time.sleep(500)
+
                 self.args.test = False
                 loss=self.train_one_epoch(i,batch_x, batch_y, batch_x_mark, batch_y_mark,self.iter_count)
                 train_loss.append(loss)

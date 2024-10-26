@@ -151,8 +151,6 @@ def AUE_Loss(outputs, batch_y,outputs_2,criterion,epoch,args):
                 loss_1_updated_f += loss_1_updated
                 loss_2_updated_f += loss_2_updated
         else:
-            # print('111')
-            # time.sleep(500)
             buckets_num_all = list(range(start, end))
             buckets_num_all.reverse()
             epochs_all = [i * 2 for i in range(len(buckets_num_all))]
