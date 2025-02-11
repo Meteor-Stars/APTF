@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import copy
 import json
-from Amortized_unpredictability_evolution_aware_loss import AUE_Loss
+from Amortized_hierarchical_predictability_aware_loss import AHPLoss
 from Loss_WaveBound import compute_loss_wavebound
 from Loss_WaveBound import EMAUpdater
 from Loss_WaveBound import  reset_batchnorm_statistics
@@ -77,7 +77,7 @@ class Exp_Main(Exp_Basic):
             model_optim = optim.AdamW(list(self.model.parameters())+additional_params, lr=self.args.learning_rate)
             return model_optim
         else:
-            if self.args.unpredictability_aware_training:
+            if self.args.predictability_aware_training:
                 model_optim = optim.AdamW(self.model.parameters(), lr=self.args.learning_rate)
                 model_optim_2 = optim.AdamW(self.model_2.parameters(), lr=self.args.learning_rate)
                 return model_optim, model_optim_2
@@ -109,13 +109,13 @@ class Exp_Main(Exp_Basic):
                 dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
 
                 if self.args.model in self.args.models_1:
-                    if self.args.unpredictability_aware_training:
+                    if self.args.predictability_aware_training:
                         outputs = self.model(batch_x)
                         # outputs_2 = self.model_2(batch_x)
                     else:
                         outputs = self.model(batch_x)
                 elif self.args.model == 'Scaleformer':
-                    if self.args.unpredictability_aware_training:
+                    if self.args.predictability_aware_training:
                         outputs_all = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                         outputs = outputs_all[-1]
                     else:
@@ -123,7 +123,7 @@ class Exp_Main(Exp_Basic):
                         outputs = outputs_all[-1]
                 else:
 
-                    if self.args.unpredictability_aware_training:
+                    if self.args.predictability_aware_training:
 
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                         # outputs_2 = self.model_2(batch_x, batch_x_mark, dec_inp, batch_y_mark)
@@ -150,7 +150,7 @@ class Exp_Main(Exp_Basic):
         loss=0
         epoch_time = time.time()
 
-        if self.args.unpredictability_aware_training:
+        if self.args.predictability_aware_training:
             self.model_optim_2.zero_grad()
         self.model_optim.zero_grad()
 
@@ -163,7 +163,7 @@ class Exp_Main(Exp_Basic):
         dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
         outputs_2=None
         if self.args.model in self.args.models_1:
-            if self.args.unpredictability_aware_training:
+            if self.args.predictability_aware_training:
                 outputs = self.model(batch_x)
                 if self.args.Amortization:
                     outputs_2= self.model_2(batch_x)
@@ -173,7 +173,7 @@ class Exp_Main(Exp_Basic):
                     outputs_2 = self.model_2(batch_x)
 
         elif self.args.model == 'Scaleformer':
-            if self.args.unpredictability_aware_training:
+            if self.args.predictability_aware_training:
                 outputs_all = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                 outputs = outputs_all[-1]
                 if self.args.Amortization:
@@ -188,7 +188,7 @@ class Exp_Main(Exp_Basic):
 
         else:
 
-            if self.args.unpredictability_aware_training:
+            if self.args.predictability_aware_training:
                 outputs = self.model(batch_x,batch_x_mark, dec_inp, batch_y_mark)
                 if self.args.Amortization:
                     outputs_2= self.model_2(batch_x,batch_x_mark, dec_inp, batch_y_mark)
@@ -199,16 +199,12 @@ class Exp_Main(Exp_Basic):
 
         rec_loss = 0
 
-        if 'MLF' in self.configs.model and self.configs.patch_squeeze and self.configs.reconstruct_loss and len(scale_all_rec.keys())!=0:
-            for scale in scale_all_rec.keys():
-                rec_loss += self.criterion_rec(scale_all_rec[scale], scale_all_patch[scale])
-            rec_loss /= (len(scale_all_rec.keys()))
 
         f_dim = -1 if self.args.features == 'MS' else 0
         batch_y = batch_y[:, -self.args.pred_len:, f_dim:].to(self.device)
-        if self.args.unpredictability_aware_training:
+        if self.args.predictability_aware_training:
 
-            loss, loss_2 = AUE_Loss(outputs, batch_y, outputs_2, self.criterion_tmp,
+            loss, loss_2 = AHPLoss(outputs, batch_y, outputs_2, self.criterion_tmp,
                                                     self.args.epoch,self.args)
 
         elif self.args.wavebound:
@@ -217,7 +213,7 @@ class Exp_Main(Exp_Basic):
         else:
             loss = self.criterion_tmp(outputs, batch_y).mean()
 
-        if self.args.unpredictability_aware_training:
+        if self.args.predictability_aware_training:
 
             loss.backward()
             self.model_optim.step()
@@ -263,7 +259,7 @@ class Exp_Main(Exp_Basic):
             os.makedirs(path)
         time_now = time.time()
         train_steps=0
-        if self.args.unpredictability_aware_training:
+        if self.args.predictability_aware_training:
             self.model_optim,self.model_optim_2 = self._select_optimizer()
 
         else:
@@ -284,7 +280,7 @@ class Exp_Main(Exp_Basic):
             train_loss = []
             self.args.epoch = epoch
             self.model.train()
-            if self.args.unpredictability_aware_training:
+            if self.args.predictability_aware_training:
                 self.model_2.train()
             epoch_time = time.time()
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
@@ -319,7 +315,7 @@ class Exp_Main(Exp_Basic):
             else:
                 self.val_loss_min = vali_loss
                 self.save_checkpoint(vali_loss, self.model, path)
-            if self.args.unpredictability_aware_training:
+            if self.args.predictability_aware_training:
                 adjust_learning_rate(self.model_optim_2, epoch + 1, self.args)
             adjust_learning_rate(self.model_optim, epoch + 1, self.args)
 
@@ -435,13 +431,13 @@ class Exp_Main(Exp_Basic):
                 # encoder - decoder
                 start_time = time.time()
                 if self.args.model in self.args.models_1:
-                    if self.args.unpredictability_aware_training:
+                    if self.args.predictability_aware_training:
                         outputs = self.model(batch_x)
                         outputs_2 = self.model_2(batch_x)
                     else:
                         outputs = self.model(batch_x)
                 else:
-                    if self.args.unpredictability_aware_training:
+                    if self.args.predictability_aware_training:
                         outputs = self.model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                         outputs_2 = self.model_2(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                     else:

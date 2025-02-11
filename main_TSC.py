@@ -77,7 +77,7 @@ args.model='resnet'
 # args.model='formertime'
 # args.model='oscnn'
 # args.model=='fcn'
-args.woEvolution=False
+args.hierarchical_bucketing=False
 device = "cuda:1"
 for seed in seeds_all:
     for dataset_name in UCR_datasets_all:
@@ -141,9 +141,9 @@ for seed in seeds_all:
 
 
 
-        args.unpredictability_aware_training = True
+        args.predictability_aware_training = True
 
-        args.Amortization=True
+        args.amortization=True
 
         fname=fname+'/'+dataset_name
         if not os.path.exists(fname):

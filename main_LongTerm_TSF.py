@@ -163,12 +163,12 @@ def main(seed):
     model='PatchTST' # TimeMixer Autoformer NSformer PatchTST NHits NLinear TimeMixer Informer Scaleformer
     args.model = model
     pred_len_ = 96 #192,336,720
-    args.unpredictability_aware_training=True
-    args.Amortization=True
+    args.predictability_aware_training=True
+    args.amortization=True
     args.wavebound = False
-    args.woEvolution = True
+    args.hierarchical_bucketing = True ##hierarchical predictability-aware loss, hierarchical bucketing
     args.seq_len = 96 #96 for TimeMixer
-
+    args.bucket_num_K=9
     seed = seed
     fix_seed = seed
     torch.manual_seed(fix_seed)

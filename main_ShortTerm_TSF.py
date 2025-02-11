@@ -179,11 +179,11 @@ def main(seed):
     args.speed_mode = True
     args.seq_len = 30
     model='PatchTST' # TimeMixer Autoformer NSformer PatchTST NHits NLinear TimeMixer Informer Scaleformer
-    args.unpredictability_aware_training=True
-    args.Amortization=False
+    args.predictability_aware_training=True
+    args.amortization=False
     args.wavebound = False
-    args.woEvolution = True
-    args.woEvolution=False
+    args.hierarchical_bucketing = True #hierarchical predictability-aware loss
+    args.bucket_num_K=9
     args.patch_pad = True
     args.context_window = None
     args.e_layers = 4
@@ -233,17 +233,6 @@ def main(seed):
     args.gpu = 0
     args.checkpoints = './checkpoints_new1008/' + data_type + '/' + args.model + '/' + 'random_seed_' + str(seed)
 
-    if args.model=='Pyraformer':
-        args.input_size = args.seq_len
-        args.predict_step = args.pred_len
-        args.device='cuda:'+str(args.gpu)
-
-        args.window_size = [3, 3, 3]
-        # args.window_size = [2, 2, 2]
-        args.input_size = args.seq_len
-        args.predict_step = args.pred_len
-
-        args.embed_type='Normal'
     args.individual = 0
     args.d_layers = 1
     args.factor = 3
@@ -285,7 +274,7 @@ def main(seed):
     args.d_model = 128
     args.d_ff = 128
     args.task_name = 'short_term_forecast'
-
+    extra=''
     if args.is_training:
         for ii in range(args.itr):
             setting = f'{args.data}_{args.model}_seq{args.seq_len}_pl{args.pred_len}'
