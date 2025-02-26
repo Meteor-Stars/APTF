@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import copy
 import json
-from Amortized_hierarchical_predictability_aware_loss import AHPLoss
+from Amortized_Hierarchical_Predictability_Aware_Loss import AHPLoss
 from Loss_WaveBound import compute_loss_wavebound
 from Loss_WaveBound import EMAUpdater
 from Loss_WaveBound import  reset_batchnorm_statistics
