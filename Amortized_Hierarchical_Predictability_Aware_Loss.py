@@ -17,7 +17,7 @@ def divide_list_equally(input_list,bucket_num):
 
     return divided_lists
 
-def generate_weights(k,ind):
+def generate_weights(k):
     if k <= 1:
         raise ValueError("k shoubl be bigger than 1")
     interval = 1 / (k - 1)
@@ -143,28 +143,32 @@ def AHPLoss(outputs, batch_y,outputs_2,criterion,epoch,args):
     elif args.task == 'TSF':
         start = 1
         end = args.bucket_num_K
+
+        buckets_num_all = list(range(start, end))
+        weight_initial = generate_weights(buckets_num_all[-1])
+
         if not args.hierarchical_bucketing:
-            buckets_num_all = list(range(start, end))
-            buckets_num_all.reverse()
             epochs_all = [i * 2 for i in range(len(buckets_num_all))]
+            buckets_num_all.reverse()
             if args.epoch in epochs_all:
                 args.ep_id = epochs_all.index(args.epoch)
             ##don't consider previous bucketing strategy
             for i, k in enumerate(buckets_num_all[args.ep_id + 1]):
+                gen_weight_tar = weight_initial[-k:]
                 loss_1_updated, loss_2_updated = sub_loss_TSF(outputs, batch_y, outputs_2, criterion, epoch,
-                                                          generate_weights(k, i), args)
+                                                          gen_weight_tar, args)
                 loss_1_updated_f += loss_1_updated
                 loss_2_updated_f += loss_2_updated
         else:
-            buckets_num_all = list(range(start, end))
-            buckets_num_all.reverse()
+
             epochs_all = [i * 2 for i in range(len(buckets_num_all))]
             if args.epoch in epochs_all:
                 args.ep_id = epochs_all.index(args.epoch)
             ##consider previous bucketing strategy
             for i, k in enumerate(buckets_num_all[:args.ep_id + 1]):
+                gen_weight_tar = weight_initial[i:]
                 loss_1_updated, loss_2_updated = sub_loss_TSF(outputs, batch_y, outputs_2, criterion, epoch,
-                                                          generate_weights(k, i), args)
+                                                          gen_weight_tar, args)
                 loss_1_updated_f += loss_1_updated
                 loss_2_updated_f += loss_2_updated
 
