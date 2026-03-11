@@ -1,6 +1,6 @@
 # Amortized Predictability-aware Training Framework for Time Series Forecasting and Classification (APTF, WWW 2026)
 
-The paper can be available here [Paper (PDF)](https://arxiv.org/abs/2602.16224).
+The paper can be available here [Paper (PDF)](https://arxiv.org/pdf/2602.16224).
 
 
 
