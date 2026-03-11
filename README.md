@@ -1,5 +1,9 @@
 # Amortized Predictability-aware Training Framework for Time Series Forecasting and Classification (APTF, WWW 2026)
 
+The paper can be available here [Paper (PDF)](https://arxiv.org/abs/2602.16224).
+
+
+
 ## Overview
 
 APTF employs a hierarchical bucketing strategy that progressively penalizes the loss of low-predictability samples during training. This design enables the model to focus on high-predictability samples while still learning appropriately from low-predictability ones, with a reduced risk of overfitting to noise:
@@ -22,5 +26,15 @@ The paper results can be reproduced by running the "Main_TSC", "Main_LongTerm_TS
 
 
 
+## Reference
+If this repository and the work are helpful to you, please consider citing it:
 
+```
+@article{zhang2026amortized,
+  title={Amortized Predictability-aware Training Framework for Time Series Forecasting and Classification},
+  author={Zhang, Xu and Wang, Peng and Li, Yichen and Wang, Wei},
+  journal={arXiv preprint arXiv:2602.16224},
+  year={2026}
+}
+```
 
